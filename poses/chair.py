@@ -26,15 +26,21 @@ def is_chair_pose(image):
         ankle_left = landmarks[mp_pose.PoseLandmark.LEFT_ANKLE]
         wrist_left = landmarks[mp_pose.PoseLandmark.LEFT_WRIST]
         shoulder_left = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER]
+        wrist_right = landmarks[mp_pose.PoseLandmark.RIGHT_WRIST]
+        shoulder_right = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+        right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR]
+        left_ear=landmarks[mp_pose.PoseLandmark.LEFT_EAR]
 
         # Calculate angles
         knee_angle_left = calculate_angle(hip_left, knee_left, ankle_left)
 
         # Pose Detection Logic
-        is_knee_correct = knee_angle_left > 90 and hip_left.y < knee_left.y
-        is_hand_raised = wrist_left.y < shoulder_left.y
+        is_knee_correct = knee_angle_left > 120 and hip_left.y < knee_left.y
+        is_hand_raised = wrist_left.y < shoulder_left.y or wrist_right.y < shoulder_right.y
+        head_above_shoulder=right_ear.y < shoulder_right.y or left_ear.y < shoulder_left.y
+        shoulder_tilt = abs(shoulder_left.y - shoulder_right.y)
 
-        if is_knee_correct and is_hand_raised:
+        if is_knee_correct and is_hand_raised and head_above_shoulder and shoulder_tilt <0.1:
             return image, "Chair Pose Detected"
 
     return image, "No Pose Detected"

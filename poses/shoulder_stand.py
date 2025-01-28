@@ -39,6 +39,9 @@ def is_shoulder_stand_pose(image):
     left_knee = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_KNEE]
     left_ankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
     right_ankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
+    
+    left_foot_index = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_FOOT_INDEX]
+    right_foot_index = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX]
 
     # Calculate shoulder and hip distances
     shoulder_distance = math.dist(
@@ -51,8 +54,11 @@ def is_shoulder_stand_pose(image):
     # Check if ankles and hips are aligned
     ankle_hip_aligned = check_ankle_hip_alignment(left_hip, right_hip, left_ankle, right_ankle)
 
+    foot_above_hip=right_foot_index.y<right_hip.y or left_foot_index.y<left_hip.y
+
+
     # Check conditions for shoulder stand pose
-    if ankle_hip_aligned and left_shoulder.y > left_knee.y:
+    if ankle_hip_aligned and left_shoulder.y > left_knee.y  and foot_above_hip:
         return image, "Shoulder Standing Pose Detected"
 
     # Return if no pose detected

@@ -42,6 +42,8 @@ def is_cobra_pose(image):
     right_knee = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_KNEE]
     left_ankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
     right_ankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
+    right_ear=results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EAR]
+    right_pinky = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_PINKY]
 
     # Calculate shoulder-hip distances
     left_shoulder_hip_distance = abs(left_shoulder.y - left_hip.y)
@@ -61,7 +63,7 @@ def is_cobra_pose(image):
 
     # Check if knees are on the floor
     knees_on_floor = (
-        abs(left_knee.y - right_knee.y) < 0.05  # Knees should be roughly aligned
+        abs(left_knee.y - right_knee.y) < 0.03  # Knees should be roughly aligned
     )
 
     # Check if palms are on the floor
@@ -70,14 +72,19 @@ def is_cobra_pose(image):
         and left_wrist.y > left_elbow.y  # Ensure wrists are below elbows
         and right_wrist.y > right_elbow.y
     )
+    shoulder_hip_knee=calculate_angle(left_shoulder,left_hip,left_knee)
+
+    head_align=abs(right_ear.x - right_pinky.x)
 
     # Determine if the Cobra Pose criteria are met
     if (
-        left_shoulder_hip_distance > 0.39 and right_shoulder_hip_distance > 0.41  # Adjusted thresholds
+        left_shoulder_hip_distance < 0.2 and right_shoulder_hip_distance < 0.3  # Adjusted thresholds
         and left_elbow_bent and right_elbow_bent
         and hips_grounded
-        and feet_on_floor and knees_on_floor and palms_on_floor
+        and feet_on_floor  and palms_on_floor
+        and shoulder_hip_knee<230 and knees_on_floor
+        and head_align < 0.1
     ):
-        return image, "Cobra Pose Detected with Feet, Knees, and Palms on Floor"
+        return image, "Cobra Pose Detected"
 
     return image, "No Pose Detected"

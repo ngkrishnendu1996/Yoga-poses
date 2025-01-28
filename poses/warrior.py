@@ -34,7 +34,7 @@ def is_warrior_pose(image):
         
 
         # Warrior pose detection conditions
-        if left_shoulder.y < right_shoulder.y and 200<front_knee_angle <300:
+        if left_shoulder.y < right_shoulder.y and 200<front_knee_angle <300 and front_arm_angle <2.5:
             return image, "Warrior Pose Detected"
 
         return image, "No Pose Detected"
